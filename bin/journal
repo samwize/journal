@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require "bundler/setup"
+require 'commander/import'
+require 'json'
+
+program :name, "Journal"
+program :version, '1.0.0'
+program :description, 'A cli for creating journal entry with correct file name'
+
+command :new do |c|
+  c.syntax = 'journal new "My entry"'
+  c.description = 'Create yyyy-MM-dd-my-entry.md in current folder'
+  c.option '--format STRING', String, 'Option file format md (default) or markdown'
+  c.action do |args, options|
+    options.default :format => 'md'
+  	title = args[0]
+    createJournal(title, options.format)
+  end
+end
+
+def createJournal(title, format)
+  slug = title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
+  today = DateTime.now.strftime('%Y-%m-%d')
+  filename = today + "-" + slug + "." + format
+
+  File.open(filename, 'w') {|f| f.write("# #{title}") }
+  puts "Created file: #{filename}"
+end

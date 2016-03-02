@@ -1,0 +1,21 @@
+PATH
+  remote: .
+  specs:
+    journal (1.0.0)
+      commander
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    commander (4.3.7)
+      highline (~> 1.7.2)
+    highline (1.7.8)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  journal!
+
+BUNDLED WITH
+   1.11.2
