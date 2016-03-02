@@ -1,11 +1,11 @@
 ## Install
 
-  gem build journal.gemspec
-  gem install journal-1.0.0.gem
+    gem build journal.gemspec
+    gem install journal-1.0.0.gem
 
 ## Usage
 
-  journal new "My entry for today"
+    journal new "My entry for today"
 
 A file "2016-03-02-my-entry-for-today.md" will be created, with the title as a header for the markdown file.
 
