@@ -7,6 +7,11 @@
 
     journal new "My entry for today"
 
-A file "2016-03-02-my-entry-for-today.md" will be created, with the title as a header for the markdown file.
+A file **2016-03-02-my-entry-for-today.md** will be created, with the title as a header in the markdown file.
 
 If you preferred the file extension to be **.markdown** instead, add `-m markdown` (default is `md`).
+
+You can also create pages (without date).
+
+    journal newpage "My page"
+    

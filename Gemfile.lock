@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    journal (1.0.0)
+    journal (1.1.0)
       commander
 
 GEM

@@ -20,10 +20,31 @@ command :new do |c|
   end
 end
 
+command :newpage do |c|
+  c.syntax = 'journal newpage "My page"'
+  c.description = 'Create my-page.md in current folder'
+  c.option '--format STRING', String, 'Option file format md (default) or markdown'
+  c.action do |args, options|
+    options.default :format => 'md'
+  	title = args[0]
+    createPage(title, options.format)
+  end
+end
+
+
 def createJournal(title, format)
   slug = title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
   today = DateTime.now.strftime('%Y-%m-%d')
   filename = today + "-" + slug + "." + format
+
+  File.open(filename, 'w') {|f| f.write("# #{title}") }
+  puts "Created file: #{filename}"
+end
+
+
+def createPage(title, format)
+  slug = title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
+  filename = slug + "." + format
 
   File.open(filename, 'w') {|f| f.write("# #{title}") }
   puts "Created file: #{filename}"
