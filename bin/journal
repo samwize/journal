@@ -53,5 +53,5 @@ end
 
 def createFile(path, content)
   File.open(path, 'w') {|f| f.write(content) }
-  puts "Created file: #{path}"
+  puts "#{path}"
 end
