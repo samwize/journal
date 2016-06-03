@@ -6,17 +6,18 @@ require 'commander/import'
 require 'json'
 
 program :name, "Journal"
-program :version, '1.0.0'
+program :version, '1.1.0'
 program :description, 'A cli for creating journal entry with correct file name'
 
 command :new do |c|
   c.syntax = 'journal new "My entry"'
-  c.description = 'Create yyyy-MM-dd-my-entry.md in current folder'
+  c.description = 'Create yyyy-MM-dd-my-entry.md'
   c.option '--format STRING', String, 'Option file format md (default) or markdown'
+  c.option '-d STRING', String, 'Option directory to create journal in'
   c.action do |args, options|
-    options.default :format => 'md'
+    options.default :format => 'md', :d => '.'
   	title = args[0]
-    createJournal(title, options.format)
+    createJournal(title, options.format, options.d)
   end
 end
 
@@ -24,28 +25,33 @@ command :newpage do |c|
   c.syntax = 'journal newpage "My page"'
   c.description = 'Create my-page.md in current folder'
   c.option '--format STRING', String, 'Option file format md (default) or markdown'
+  c.option '-d STRING', String, 'Option directory to create journal in'
   c.action do |args, options|
-    options.default :format => 'md'
+    options.default :format => 'md', :d => '.'
   	title = args[0]
-    createPage(title, options.format)
+    createPage(title, options.format, options.d)
   end
 end
 
 
-def createJournal(title, format)
+def createJournal(title, format, directory)
   slug = title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
   today = DateTime.now.strftime('%Y-%m-%d')
   filename = today + "-" + slug + "." + format
-
-  File.open(filename, 'w') {|f| f.write("# #{title}") }
-  puts "Created file: #{filename}"
+  fullpath = File.join(directory, filename)
+  createFile(fullpath, "# #{title}")
 end
 
 
-def createPage(title, format)
+def createPage(title, format, directory)
   slug = title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
   filename = slug + "." + format
+  fullpath = File.join(directory, filename)
+  createFile(fullpath, "# #{title}")
+end
 
-  File.open(filename, 'w') {|f| f.write("# #{title}") }
-  puts "Created file: #{filename}"
+
+def createFile(path, content)
+  File.open(path, 'w') {|f| f.write(content) }
+  puts "Created file: #{path}"
 end
