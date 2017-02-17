@@ -1,7 +1,10 @@
 ## Install
 
     gem build journal.gemspec
-    gem install journal-1.0.0.gem
+    gem install journal-1.1.0.gem
+
+If you encounter "full_gem_path uninitialized constant error", read [this](https://github.com/fastlane/fastlane/issues/6066). You probably need to upgrade gemset and bundler.
+
 
 ## Usage
 
@@ -14,4 +17,3 @@ If you preferred the file extension to be **.markdown** instead, add `-m markdow
 You can also create pages (without date).
 
     journal newpage "My page"
-    
