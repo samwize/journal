@@ -33,6 +33,14 @@ command :newpage do |c|
   end
 end
 
+command :dehtml do |c|
+  c.syntax = 'journal dehtml xxx.html'
+  c.description = 'Convert xxx.markdown'
+  c.action do |args, options|
+    htmlfile = args[0]
+    convertHtmlToMarkdown(htmlfile)
+  end
+end
 
 def createJournal(title, format, directory)
   slug = title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
@@ -42,7 +50,6 @@ def createJournal(title, format, directory)
   createFile(fullpath, "# #{title}")
 end
 
-
 def createPage(title, format, directory)
   slug = title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
   filename = slug + "." + format
@@ -50,8 +57,31 @@ def createPage(title, format, directory)
   createFile(fullpath, "# #{title}")
 end
 
-
 def createFile(path, content)
   File.open(path, 'w') {|f| f.write(content) }
   puts "#{path}"
+end
+
+def convertHtmlToMarkdown(htmlfile)
+  contents = File.open(htmlfile, "rb") { |f| f.read }
+  md = contents.gsub(/<br \/>/, "\n")
+    .gsub(/&nbsp;/, " ")
+    .gsub(/<i>(.*?)<\/i>/, "_\\1_")
+    .gsub(/<blockquote.*?>(.*?)<\/blockquote>/, "\n> \\1\n\n")
+    .gsub(/<a href=\"(http.*?)\".*?>(.*?)<\/a>/, "[\\2](\\1)")
+    .gsub(/<img.*?src=\"(http.*?\").*?\/>/, "![](\\1)")
+    .gsub(/<\/?div.*?>/, "")
+    .gsub(/<h3>(.*?)<\/h3>/, "## $1\n\n")
+    .gsub(/^blogger_id:.*?\n/, "")
+    .gsub(/^blogger_orig_url:.*?\n/, "")
+    .gsub(/^modified_time:.*?\n/, "")
+  # puts "#{md}"
+
+  mdFile = htmlfile.gsub(".html", ".markdown")
+
+  File.open(mdFile, "w") do |f|
+    f.write(md)
+  end
+
+  File.delete(htmlfile)
 end
