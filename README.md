@@ -17,3 +17,12 @@ If you preferred the file extension to be **.markdown** instead, add `-m markdow
 You can also create pages (without date).
 
     journal newpage "My page"
+
+
+## Pitfalls
+
+    /Users/junda/.rvm/gems/ruby-2.3.4/gems/journal-1.2.0/bin/journal:5:in `require': cannot load such file -- commander/import (LoadError)
+
+Cannot run journal in a project with gems.. eg. in Websites/just2me.com.
+
+Run it "outside".

@@ -63,25 +63,47 @@ def createFile(path, content)
 end
 
 def convertHtmlToMarkdown(htmlfile)
-  contents = File.open(htmlfile, "rb") { |f| f.read }
+  mdFile = htmlfile.gsub(".html", ".markdown")
+  File.rename(htmlfile, mdFile)
+
+  contents = File.open(mdFile, "rb") { |f| f.read }
   md = contents.gsub(/<br \/>/, "\n")
     .gsub(/&nbsp;/, " ")
+    .gsub(/&amp;/, "&")
+    .gsub(/&lt;/, "<")
+    .gsub(/&gt;/, ">")
     .gsub(/<i>(.*?)<\/i>/, "_\\1_")
+    .gsub(/<em.*?>(.*?)<\/em>/, "_\\1_")
+    .gsub(/<b>(.*?)<\/b>/, "**\\1**")
+    .gsub(/<strong.*?>(.*?)<\/strong>/, "**\\1**")
+    .gsub(/<a .*?href=\"(http.*?)\".*?>(.*?)<\/a>/, "[\\2](\\1)")
+    .gsub(/<img.*?src=\"(http.*?)\".*?\/>/, "![](\\1)")
     .gsub(/<blockquote.*?>(.*?)<\/blockquote>/, "\n> \\1\n\n")
-    .gsub(/<a href=\"(http.*?)\".*?>(.*?)<\/a>/, "[\\2](\\1)")
-    .gsub(/<img.*?src=\"(http.*?\").*?\/>/, "![](\\1)")
-    .gsub(/<\/?div.*?>/, "")
-    .gsub(/<h3>(.*?)<\/h3>/, "## $1\n\n")
+    .gsub(/<span.*?>(.*?)<\/span>/, "\\1")
+    .gsub(/<time.*?>(.*?)<\/time>/, "\\1")
+    .gsub(/<\/?div.*?>/, "\n")
+    .gsub(/<\/?section.*?>/, "\n")
+    .gsub(/<\/?figure.*?>/, "\n")
+    .gsub(/<\/?canvas.*?>/, "\n")
+    .gsub(/<\/?table.*?>/, "")
+    .gsub(/<\/?tbody.*?>/, "")
+    .gsub(/<tr.*?>/, "\n")
+    .gsub(/<\/tr.*?>/, "")
+    .gsub(/<\/?td.*?>/, "")
+    .gsub(/<h2.*?>(.*?)<\/h2>/, "\n# \\1\n\n")
+    .gsub(/<h3.*?>(.*?)<\/h3>/, "\n## \\1\n\n")
+    .gsub(/<\/?ul.*?>/, "")
+    .gsub(/<li.*?>(.*?)<\/li>/, "\n- \\1")
+    .gsub(/<hr.*?\/>/, "---\n")
+    .gsub(/<hr.*?\/>/, "---\n")
     .gsub(/^blogger_id:.*?\n/, "")
     .gsub(/^blogger_orig_url:.*?\n/, "")
     .gsub(/^modified_time:.*?\n/, "")
+    .gsub(/^thumbnail:.*?\n/, "")
+    .gsub(/[\n]{3,}/, "\n\n")
   # puts "#{md}"
-
-  mdFile = htmlfile.gsub(".html", ".markdown")
 
   File.open(mdFile, "w") do |f|
     f.write(md)
   end
-
-  File.delete(htmlfile)
 end
