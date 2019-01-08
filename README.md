@@ -1,7 +1,7 @@
 ## Install
 
-    gem build journal.gemspec
-    gem install journal-1.1.0.gem
+    gem build journal.gemspec & \
+    gem install journal-1.2.0.gem
 
 If you encounter "full_gem_path uninitialized constant error", read [this](https://github.com/fastlane/fastlane/issues/6066). You probably need to upgrade gemset and bundler.
 

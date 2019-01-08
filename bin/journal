@@ -42,6 +42,15 @@ command :dehtml do |c|
   end
 end
 
+command :objc_to_swift do |c|
+  c.syntax = 'journal objc_to_swift AppDelegate.m'
+  c.description = 'Convert Objective-C to Swift'
+  c.action do |args, options|
+    objcFile = args[0]
+    convertObjcToSwift(objcFile)
+  end
+end
+
 def createJournal(title, format, directory)
   slug = title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
   today = DateTime.now.strftime('%Y-%m-%d')
@@ -113,4 +122,33 @@ def convertHtmlToMarkdown(htmlfile)
   File.open(mdFile, "w") do |f|
     f.write(md)
   end
+end
+
+def convertObjcToSwift(objcFile)
+  swiftFile = objcFile.gsub(".m", "-2.swift")
+  File.new(swiftFile, "w+")
+
+  contents = File.open(objcFile, "rb") { |f| f.read }
+  newContents = contents.gsub(/@"(.*?)"/, "\"\\1\"") # Remove @ prefix in string
+    .gsub(/^(.*);$/, "\\1") # Remove last ;
+    .gsub(/\[NSUserDefaults standardUserDefaults\]/, "UserDefaults.standard") # [NSUserDefaults standardUserDefaults]
+    .gsub(/\[([a-zA-Z0-9_.]+?) ([a-zA-Z0-9_]+?)\]/, "\\1.\\2()") # myClass.method()
+    .gsub(/\[([a-zA-Z0-9_.]+?) ([a-zA-Z0-9_]+?):([^\s\[\]]+?)\]/, "\\1.\\2(\\3)") # myClass.method(foo)
+    .gsub(/\[([a-zA-Z0-9_.]+?) ([a-zA-Z0-9_]+?):([^\s\[\]]+?) ([a-zA-Z0-9_]+?):([^\s\[\]]+?)\]/, "\\1.\\2(\\3, \\4: \\5)") # myClass.method(foo, b1: b)
+    .gsub(/\[([a-zA-Z0-9_.]+?) ([a-zA-Z0-9_]+?):([^\s\[\]]+?) ([a-zA-Z0-9_]+?):([^\s\[\]]+?) ([a-zA-Z0-9_]+?):([^\s\[\]]+?)\]/, "\\1.\\2(\\3, \\4: \\5, \\6: \\7)") # myClass.method(foo, b1: b, b2: b)
+    .gsub(/\[([a-zA-Z0-9_.]+?) ([a-zA-Z0-9_]+?):([^\s\[\]]+?) ([a-zA-Z0-9_]+?):([^\s\[\]]+?) ([a-zA-Z0-9_]+?):([^\s\[\]]+?) ([a-zA-Z0-9_]+?):([^\s\[\]]+?)\]/, "\\1.\\2(\\3, \\4: \\5, \\6: \\7, \\8: \\9)") # myClass.method(foo, b1: b, b2: b, b3: b)
+    .gsub(/-\(([a-zA-Z0-9_*]+?)\)([a-zA-Z0-9_]+?) \{/, "func \\2() -> \\1 {") # func foo() {
+    .gsub(/\+\(([a-zA-Z0-9_*]+?)\)([a-zA-Z0-9_]+?) \{/, "class func \\2() -> \\1 {") # class func foo() {
+    .gsub(/-\(([a-zA-Z0-9_*]+?)\)([a-zA-Z0-9_]+?):\(([a-zA-Z0-9_*]+?)\)([a-zA-Z0-9_]+?) \{/, "func \\2(\\4: \\3) -> \\1 {") # func foo(bar1: bar) {
+    .gsub(/\+\(([a-zA-Z0-9_*]+?)\)([a-zA-Z0-9_]+?):\(([a-zA-Z0-9_*]+?)\)([a-zA-Z0-9_]+?) \{/, "class func \\2(\\4: \\3) -> \\1 {") # func foo(bar1: bar) {
+    .gsub(/ -> void \{/, " {") # Clean up void return
+    .gsub(/([a-zA-Z0-9_]+?) \*([a-zA-Z0-9_]+?) = /, "let \\2 = ") # Set var
+    .gsub(/ NO/, " false")
+    .gsub(/ YES/, " true")
+
+  File.open(swiftFile, "w") do |f|
+    # puts "#{newContents}"
+    f.write(newContents)
+  end
+
 end
