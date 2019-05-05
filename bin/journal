@@ -57,6 +57,8 @@ def createJournal(title, format, directory)
   filename = today + "-" + slug + "." + format
   fullpath = File.join(directory, filename)
   createFile(fullpath, "# #{title}")
+  pbcopy(fullpath)
+  puts "#{fullpath} created and path copied"
 end
 
 def createPage(title, format, directory)
@@ -64,11 +66,18 @@ def createPage(title, format, directory)
   filename = slug + "." + format
   fullpath = File.join(directory, filename)
   createFile(fullpath, "# #{title}")
+  pbcopy(fullpath)
+  puts "#{fullpath} created and path copied"
 end
 
 def createFile(path, content)
   File.open(path, 'w') {|f| f.write(content) }
-  puts "#{path}"
+end
+
+def pbcopy(input)
+  str = input.to_s
+  IO.popen('pbcopy', 'w') { |f| f << str }
+  str
 end
 
 def convertHtmlToMarkdown(htmlfile)
@@ -131,7 +140,11 @@ def convertObjcToSwift(objcFile)
   contents = File.open(objcFile, "rb") { |f| f.read }
   newContents = contents.gsub(/@"(.*?)"/, "\"\\1\"") # Remove @ prefix in string
     .gsub(/^(.*);$/, "\\1") # Remove last ;
-    .gsub(/\[NSUserDefaults standardUserDefaults\]/, "UserDefaults.standard") # [NSUserDefaults standardUserDefaults]
+    .gsub("[NSUserDefaults standardUserDefaults]", "UserDefaults.standard")
+    .gsub("[NSNotificationCenter defaultCenter]", "NotificationCenter.default")
+    .gsub("[UIApplication sharedApplication]", "UIApplication.shared")
+    .gsub(/\[UIImage imageNamed:([^\s\[\]]+?)\]/, "UIImage(named: \\1)")
+    .gsub(/Local\("(.*)"\)/, "LS(\"\\1\")")
     .gsub(/\[([a-zA-Z0-9_.]+?) ([a-zA-Z0-9_]+?)\]/, "\\1.\\2()") # myClass.method()
     .gsub(/\[([a-zA-Z0-9_.]+?) ([a-zA-Z0-9_]+?):([^\s\[\]]+?)\]/, "\\1.\\2(\\3)") # myClass.method(foo)
     .gsub(/\[([a-zA-Z0-9_.]+?) ([a-zA-Z0-9_]+?):([^\s\[\]]+?) ([a-zA-Z0-9_]+?):([^\s\[\]]+?)\]/, "\\1.\\2(\\3, \\4: \\5)") # myClass.method(foo, b1: b)
